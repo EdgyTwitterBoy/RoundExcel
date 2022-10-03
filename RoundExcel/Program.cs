@@ -15,14 +15,15 @@ public class App
     public void Main(string[] args)
     {
         string path = $@"./{GetFileName()}.xlsx";
-        File.Copy(path, path.Replace(".xlsx", "_original.xlsx"), true);
+        string newPath = path.Replace(".xlsx", "_rounded.xlsx");
+        File.Copy(path, newPath, true);
         SheetInfo sheetInfo = new SheetInfo();
         sheetInfo.SetExcludeRows(GetExcludeRows());
         sheetInfo.SetExcludeColumns(GetExcludeColumns());
         sheetInfo.SetRange(GetSecondRangeCell());
 
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-        var package = new ExcelPackage(new FileInfo(path));
+        var package = new ExcelPackage(new FileInfo(newPath));
         var sheet = package.Workbook.Worksheets.First();
         Console.WriteLine($"{sheet.Cells["A1"].Text}");
         foreach (var cell in sheetInfo.Range.GetCells())
