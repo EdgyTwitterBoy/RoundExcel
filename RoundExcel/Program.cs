@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 using Microsoft.Office.Interop.Excel;
 using OfficeOpenXml;
 using RoundExcel.CellManagement;
@@ -46,11 +47,55 @@ public class App
     private double RoundToSignificantDigits(double d){
         if(d == 0)
             return 0;
-
+    
         double scale = Math.Pow(10, Math.Floor(Math.Log10(Math.Abs(d))) + 1);
-        return scale * Math.Round(d / scale, 3);
+        double result = scale * Math.Round(d / scale, 3);
+        return CheckLongNumber(result);
     }
 
+    private double CheckLongNumber(double number)
+    {
+        string numberString = number.ToString().Replace('.', ',');
+        if (!numberString.Contains(','))
+        {
+            return number;
+        }
+
+        string numbersBeforeComma = numberString.Split(',')[0];
+        string numbersAfterComma = numberString.Split(',')[1];
+        
+        if (numbersBeforeComma.Length > 3)
+        {
+            return Math.Round(number, 0);
+        }
+        
+        switch (numbersBeforeComma.Length)
+        {
+            case 1:
+                if (numbersBeforeComma != "0")
+                {
+                    return Math.Round(number, 2);
+                }
+                break;
+
+            case 2:
+                if (numbersAfterComma.Contains("000") || numbersAfterComma.Contains("999"))
+                {
+                    return Math.Round(number, 1);
+                }
+                break;
+
+            case 3:
+                if (numbersAfterComma.Length > 0)
+                {
+                    return double.Parse(numbersBeforeComma);
+                }
+                break;
+            
+        }
+        
+        return number;
+    }
 
     private string GetSecondRangeCell()
     {
