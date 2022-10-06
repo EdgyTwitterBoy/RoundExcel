@@ -28,12 +28,17 @@ public class App
         Console.WriteLine($"{sheet.Cells["A1"].Text}");
         foreach (var cell in sheetInfo.Range.GetCells())
         {
-            if (double.TryParse(sheet.Cells[cell.ToString()].Text, out var newValue))
-            {
-                if(sheetInfo.ExcludeRows.Contains(cell.Row) || sheetInfo.ExcludeColumns.Contains(cell.Column)) continue;
-                Console.WriteLine("Changing value of cell {0} from {1} to {2}", cell, sheet.Cells[cell.ToString()].Text, RoundToSignificantDigits(newValue).ToString().Replace('.', ','));
-                sheet.Cells[cell.ToString()].Value = RoundToSignificantDigits(newValue).ToString().Replace('.', ',');
-            }
+            Console.WriteLine("Checking cell: " + cell);
+            Console.WriteLine("\tCell text: " + sheet.Cells[cell.ToString()].Text);
+            
+            if (cell.Column == "A" && sheet.Cells[cell.ToString()].Text.Contains('$')) sheetInfo.ExcludeRows.Add(cell.Row);
+            if (cell.Row == 1 && sheet.Cells[cell.ToString()].Text.Contains('$')) sheetInfo.ExcludeColumns.Add(cell.Column);
+            if (!double.TryParse(sheet.Cells[cell.ToString()].Text, out var newValue)) continue;
+            if(sheetInfo.ExcludeRows.Contains(cell.Row) || sheetInfo.ExcludeColumns.Contains(cell.Column)) continue;
+
+            Console.WriteLine("\tChanging value of cell {0} from {1} to {2}", cell, sheet.Cells[cell.ToString()].Text, RoundToSignificantDigits(newValue).ToString().Replace('.', ','));
+            sheet.Cells[cell.ToString()].Value = RoundToSignificantDigits(newValue).ToString().Replace('.', ',');
+            Console.WriteLine("\tCell number format: " + sheet.Cells[cell.ToString()].Style.Numberformat.Format);
         }
         package.Save();
     }

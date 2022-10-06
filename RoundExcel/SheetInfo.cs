@@ -25,7 +25,11 @@ public class SheetInfo
         }
     }
 
-    public SheetInfo(){}
+    public SheetInfo()
+    {
+        ExcludeColumns = new List<string>();
+        ExcludeRows = new List<int>();
+    }
     
     public void SetExcludeColumns(string excludeColumns)
     {
